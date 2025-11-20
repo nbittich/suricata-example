@@ -1,0 +1,27 @@
+services:
+  ####### curl     #######
+  curl:
+    networks:
+      mon_ids:
+    build:
+      context: ./curl/.
+  ####### Suricata #######
+  suricata:
+    build:
+      context: suricata/.
+    network_mode: host
+    volumes:
+      - ./config/suricata/suricata.yml:/etc/suricata/suricata.yml
+      - ./data/suricata/rules:/var/lib/suricata/rules
+      - ./data/suricata/logs:/var/log/suricata/
+    command: /bin/bash -c "suricata-update && suricata -c /etc/suricata/suricata.yaml -i mon_ids && tail -f /var/log/cron.log"
+networks:
+  mon_ids:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.22.0.0/16
+    driver_opts:
+      com.docker.network.bridge.name: mon_ids
+
