@@ -1,10 +1,25 @@
 services:
+  ####### Prometheus #######
+  prometheus:
+    user: root
+    image: prom/prometheus:v2.48.1
+    volumes:
+      - ./config/node_exporter/dev/node_exporter.crt:/node_exporter.crt
+      - ./data/prometheus:/prometheus
+      - ./config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      mon_ids:
   ####### curl     #######
   curl:
     networks:
       mon_ids:
     build:
       context: ./curl/.
+  node_exporter:
+    networks:
+      mon_ids:
+    image: prom/node-exporter:latest
+    command: --web.config.file=/etc/node_exporter/config.yml
   ####### Suricata #######
   suricata:
     build:

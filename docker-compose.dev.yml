@@ -1,0 +1,11 @@
+services:
+  node_exporter:
+   volumes:
+      - ./config/node_exporter/dev/:/etc/node_exporter/ 
+   ports:
+      - "9100:9100"
+  prometheus:
+    volumes:
+      - ./config/node_exporter/dev/node_exporter.crt:/node_exporter.crt
+    ports:
+      - "9090:9090"

@@ -1,1 +1,3 @@
 /data/
+./config/node_exporter/prod
+.env
