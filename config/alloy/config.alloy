@@ -1,0 +1,41 @@
+local.file_match "suricata" {
+  path_targets = [{"__path__" = "/var/log/eve.json"}]
+  sync_period = "5s"
+}
+
+loki.source.file "log_scrape" {
+  targets    = local.file_match.suricata.targets
+  forward_to = [loki.process.suricata_filter.receiver]
+  tail_from_end = true
+}
+
+loki.process "suricata_filter" {
+  stage.json {
+    expressions = {
+      event_type = "event_type",
+      severity   = "alert.severity",
+      category   = "alert.category",
+      signature  = "alert.signature",
+    }
+  }
+
+  stage.drop {
+    expression = "event_type != \"alert\""
+    drop_counter_reason = "non_alert_event"
+  }
+
+  stage.drop {
+    expression = "severity != \"\" and to_int(severity) > 2"
+    drop_counter_reason = "low_severity_alert"
+  }
+
+
+  forward_to = [loki.write.grafana_loki.receiver]
+}
+
+loki.write "grafana_loki" {
+  endpoint {
+    url = "http://loki:3100/loki/api/v1/push"
+  }
+}
+

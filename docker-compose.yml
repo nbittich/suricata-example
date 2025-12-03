@@ -1,4 +1,22 @@
 services:
+  alloy:
+    image: grafana/alloy:v1.12.0
+    networks:
+        mon_ids:
+    volumes:
+      - ./data/suricata/logs/eve.json:/var/log/eve.json
+      - ./config/alloy/config.alloy:/etc/alloy/config.alloy
+      - ./data/alloy:/var/lib/alloy
+    command: ["run", "/etc/alloy/config.alloy"]
+  loki:
+    image: grafana/loki:3.5.8
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./config/loki/local-config.yaml:/etc/loki/local-config.yaml
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+        mon_ids:
   ####### Prometheus #######
   prometheus:
     user: root
