@@ -6,28 +6,24 @@ local.file_match "suricata" {
 loki.source.file "log_scrape" {
   targets    = local.file_match.suricata.targets
   forward_to = [loki.process.suricata_filter.receiver]
-  tail_from_end = true
+  tail_from_end = false
 }
 
 loki.process "suricata_filter" {
   stage.json {
     expressions = {
-      event_type = "event_type",
-      severity   = "alert.severity",
-      category   = "alert.category",
-      signature  = "alert.signature",
+      "alert" = "alert",
+      "timestamp" ="timestamp",
+      "dns" = "dns",
+      "src_ip" = "src_ip",
+      "src_port" = "src_port",
+      "dest_ip" = "dest_ip",
+      "dest_port" = "dest_port",
+      "event_type" =  "event_type",
+      "in_iface" = "in_iface",
     }
   }
 
-  stage.drop {
-    expression = "event_type != \"alert\""
-    drop_counter_reason = "non_alert_event"
-  }
-
-  stage.drop {
-    expression = "severity != \"\" and to_int(severity) > 2"
-    drop_counter_reason = "low_severity_alert"
-  }
 
 
   forward_to = [loki.write.grafana_loki.receiver]
