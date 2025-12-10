@@ -46,7 +46,7 @@ services:
       context: suricata/.
     network_mode: host
     volumes:
-      - ./config/suricata/suricata.yml:/etc/suricata/suricata.yml
+      - ./config/suricata/suricata.yaml:/etc/suricata/suricata.yaml
       - ./data/suricata/rules:/var/lib/suricata/rules
       - ./data/suricata/logs:/var/log/suricata/
     command: /bin/bash -c "suricata-update && suricata -c /etc/suricata/suricata.yaml -i mon_ids && tail -f /var/log/cron.log"
