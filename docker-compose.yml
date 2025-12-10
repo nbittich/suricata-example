@@ -44,12 +44,16 @@ services:
   suricata:
     build:
       context: suricata/.
-    network_mode: host
+    cap_add:
+     - NET_ADMIN
+     - NET_RAW
+    networks:
+        mon_ids:
     volumes:
       - ./config/suricata/suricata.yaml:/etc/suricata/suricata.yaml
       - ./data/suricata/rules:/var/lib/suricata/rules
       - ./data/suricata/logs:/var/log/suricata/
-    command: /bin/bash -c "suricata-update && suricata -c /etc/suricata/suricata.yaml -i mon_ids && tail -f /var/log/cron.log"
+    command: /bin/bash -c "suricata-update && suricata -c /etc/suricata/suricata.yaml -i eth0 && tail -f /var/log/cron.log"
 networks:
   mon_ids:
     driver: bridge
