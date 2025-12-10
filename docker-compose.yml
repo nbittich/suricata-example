@@ -2,46 +2,14 @@ services:
   grafana:
     networks:
         mon_ids:
-    environment:
-      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
-      - GF_AUTH_ANONYMOUS_ENABLED=true
-      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
-    entrypoint:
-      - sh
-      - -euc
-      - |
-        mkdir -p /etc/grafana/provisioning/datasources
-        cat <<EOF > /etc/grafana/provisioning/datasources/ds.yaml
-        apiVersion: 1
-        datasources:
-        - name: Loki
-          type: loki
-          access: proxy
-          orgId: 1
-          url: http://loki:3100
-          basicAuth: false
-          isDefault: false
-          version: 1
-          editable: false
-        - name: Prometheus
-          type: prometheus
-          orgId: 1
-          url: http://prometheus:9090
-          basicAuth: false
-          isDefault: true
-          version: 1
-          editable: false
-        EOF
-        /run.sh
     image: grafana/grafana:12.1
-    ports:
-      - "3000:3000"
+
   alloy:
     image: grafana/alloy:v1.12.0
     networks:
         mon_ids:
     volumes:
-      - ./data/suricata/logs/eve.json:/var/log/eve.json
+      - ./data/suricata/logs/eve.json:/var/log/eve.json:ro
       - ./config/alloy/config.alloy:/etc/alloy/config.alloy
       - ./data/alloy:/var/lib/alloy
     command: ["run", "/etc/alloy/config.alloy"]
@@ -57,7 +25,6 @@ services:
     user: root
     image: prom/prometheus:v2.48.1
     volumes:
-      - ./config/node_exporter/dev/node_exporter.crt:/node_exporter.crt
       - ./data/prometheus:/prometheus
       - ./config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     networks:
