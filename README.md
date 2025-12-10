@@ -1,5 +1,4 @@
 - run `cp .env.example .env`
-- create the network: `docker compose network create mon_ids`
 - execute `docker compose up -d suricata curl`
 - run `docker compose exec curl bash -c "curl -sSL https://raw.githubusercontent.com/3CORESec/testmynids.org/master/tmNIDS -o /tmp/tmNIDS && chmod +x /tmp/tmNIDS && /tmp/tmNIDS -5"`
 - verify with testmynids ` cat data/suricata/logs/eve.json | jq '.  | select(.event_type =="alert") | select(.alert.severity <= 2) | {alert} | .alert |  {severity, category, signature} '`
